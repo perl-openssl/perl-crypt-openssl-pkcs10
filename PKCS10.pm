@@ -30,7 +30,7 @@ our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 	
 #);
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 require XSLoader;
 XSLoader::load('Crypt::OpenSSL::PKCS10', $VERSION);
@@ -48,6 +48,8 @@ sub new_from_rsa {
 
 1;
 __END__
+
+# ABSTRACT: Perl extension to OpenSSL's PKCS10 API.
 
 =head1 NAME
 
