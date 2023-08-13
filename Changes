@@ -2,6 +2,19 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
 {{$NEXT}}
 
+0.23 -- Sun Aug 13 14:39:03 ADT 2023
+
+        [Significant updates since 0.20]
+        - First release with new maintainer TIMLEGGE
+        - Support openssl greater than 1.0 without warnings
+        - Fix builds on Solaris, windows and most bsds
+        - Several bugfixes from the issues list
+        - Missed indexing in 0.22 provides was not in META
+
+        [Change Log]
+        - aff07b2 Move pm file to allow indexing to work properly
+        - eb0c2e4 v0.22
+
 0.22 -- Sat Aug 12 09:45:26 ADT 2023
 
         [Significant updates since 0.20]
