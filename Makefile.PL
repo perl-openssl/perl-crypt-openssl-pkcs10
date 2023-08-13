@@ -68,13 +68,15 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.008",
   "NAME" => "Crypt::OpenSSL::PKCS10",
   "PREREQ_PM" => {
-    "Crypt::OpenSSL::RSA" => 0
+    "Crypt::OpenSSL::RSA" => 0,
+    "Exporter" => 0,
+    "XSLoader" => 0
   },
   "TEST_REQUIRES" => {
     "Crypt::OpenSSL::RSA" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.22",
+  "VERSION" => "0.23",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -88,7 +90,9 @@ my %WriteMakefileArgs = (
 my %FallbackPrereqs = (
   "Crypt::OpenSSL::Guess" => "0.11",
   "Crypt::OpenSSL::RSA" => 0,
-  "Test::More" => 0
+  "Exporter" => 0,
+  "Test::More" => 0,
+  "XSLoader" => 0
 );
 
 unless ( eval { ExtUtils::MakeMaker->VERSION('6.63_03') } ) {
