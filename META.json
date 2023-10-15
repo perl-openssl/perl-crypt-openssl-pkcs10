@@ -54,7 +54,7 @@
    "provides" : {
       "Crypt::OpenSSL::PKCS10" : {
          "file" : "lib/Crypt/OpenSSL/PKCS10.pm",
-         "version" : "0.24"
+         "version" : "0.25"
       }
    },
    "release_status" : "stable",
@@ -69,8 +69,8 @@
          "web" : "https://github.com/perl-openssl/perl-crypt-openssl-pkcs10"
       }
    },
-   "version" : "0.24",
-   "x_generated_by_perl" : "v5.36.1",
+   "version" : "0.25",
+   "x_generated_by_perl" : "v5.38.0",
    "x_maintainers" : [
       "Timothy Legge <timlegge@cpan.org>"
    ],

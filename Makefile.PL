@@ -80,7 +80,7 @@ my %WriteMakefileArgs = (
     "Crypt::OpenSSL::RSA" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.24",
+  "VERSION" => "0.25",
   "test" => {
     "TESTS" => "t/*.t"
   }
