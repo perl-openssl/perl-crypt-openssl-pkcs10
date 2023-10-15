@@ -2,6 +2,16 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
 {{$NEXT}}
 
+0.25 -- Sun Oct 15 20:41:15 ADT 2023
+
+        [Significant updates since 0.24]
+        - Maybe really fix issue on old OpenSSL versions
+
+        [Change Log]
+        - 200762b Release - get release notes from SignReleaseNotes file
+        - 467f2ff Fix really old openssl version issue
+        - 85fa71a v0.24
+
 0.24 -- Sat Oct 07 16:11:58 ADT 2023
 
         [Significant updates since 0.23]
