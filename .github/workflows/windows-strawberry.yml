@@ -26,13 +26,13 @@ jobs:
         distribution: strawberry
     - name: perl -V
       run: perl -V
-       - name: Install Dependencies
-         run: |
-           cpanm -nq --with-develop --installdeps -v .
-       - name: Build Module
-         run: |
-           perl Makefile.PL
-           gmake
-       - name: Run Tests
-         run: |
-           gmake test TEST_VERBOSE=1
+    - name: Install Dependencies
+      run: |
+        cpanm -nq --with-develop --installdeps -v .
+    - name: Build Module
+      run: |
+        perl Makefile.PL
+        gmake
+    - name: Run Tests
+      run: |
+        gmake test TEST_VERBOSE=1
