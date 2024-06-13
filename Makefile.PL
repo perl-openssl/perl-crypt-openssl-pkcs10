@@ -17,8 +17,13 @@ my %args;
 my ($major, $minor, $patch) = openssl_version();
 print "Installed OpenSSL: $major.$minor.$patch\n";
 
+my $libs = ' -lssl -lcrypto';
+if ($Config{osname} eq 'aix') {
+  $libs = $libs . ' -lz';
+}
+
 $args{INC} =  openssl_inc_paths();
-$args{LIBS} = [openssl_lib_paths() . ' -lssl -lcrypto'];
+$args{LIBS} = [openssl_lib_paths() . $libs];
 
 my $cc_option_flags;
 
