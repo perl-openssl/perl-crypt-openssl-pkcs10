@@ -45,6 +45,9 @@ typedef struct
   if (New(0, p_var, p_size, p_type) == NULL) \
     { PACKAGE_CROAK("unable to alloc buffer"); }
 
+#define FORMAT_ASN1     1
+#define FORMAT_PEM      3
+
 //int add_ext_raw(STACK_OF(X509_REQUEST) *sk, int nid, unsigned char *value, int length);
 //int add_ext(STACK_OF(X509_REQUEST) *sk, int nid, char *value);
 X509_NAME *parse_name(char *str, long chtype, int multirdn); 
@@ -334,6 +337,8 @@ BOOT:
 	{"NID_netscape_comment", NID_netscape_comment},
 	{"NID_ext_key_usage", NID_ext_key_usage},
 	{"NID_subject_key_identifier", NID_subject_key_identifier},
+	{"FORMAT_ASN1", FORMAT_ASN1},
+	{"FORMAT_PEM", FORMAT_PEM},
 	{Nullch,0}};
 
 	char *name;
@@ -736,9 +741,10 @@ add_ext_final(pkcs10)
 	RETVAL
 
 SV*
-new_from_file(class, filename_SV)
+new_from_file(class, filename_SV, format = FORMAT_PEM)
   SV* class;
   SV* filename_SV;
+  int format;
 
   PREINIT:
   char* filename;
@@ -752,7 +758,11 @@ new_from_file(class, filename_SV)
   if (fp == NULL) {
           croak ("Cannot open file '%s'", filename);
   }
-  req = PEM_read_X509_REQ (fp, NULL, NULL, NULL);
+  if (format == FORMAT_ASN1)
+    req = d2i_X509_REQ_fp (fp, NULL);
+  else 
+    req = PEM_read_X509_REQ (fp, NULL, NULL, NULL);
+
   fclose(fp);
 
   RETVAL = make_pkcs10_obj(class, req, NULL, NULL, NULL);

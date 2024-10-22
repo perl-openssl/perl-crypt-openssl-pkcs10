@@ -105,6 +105,12 @@ Create a new Crypt::OpenSSL::PKCS10 object by reading the request and key inform
 
   my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr");
 
+Can also specify the format of the PKCS10 file, either DER or PEM format.  Here are some examples:
+
+  my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
+
+  my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.der", Crypt::OpenSSL::PKCS10::FORMAT_ASN1());
+
 =back
 
 =head1 Instance Methods
