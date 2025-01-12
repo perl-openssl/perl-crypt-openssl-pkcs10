@@ -54,7 +54,7 @@ ok($req);
 }
 
 {
-my $req_2 = Crypt::OpenSSL::PKCS10->new_from_file("t/CSR.csr");
+my $req_2 = Crypt::OpenSSL::PKCS10->new_from_file("t/csrs/CSR.csr");
 like($req_2->subject(), qr/C=DE, ST=NRW, L=Foo, O=Internet Widgits Pty Ltd, CN=foo.der.bar.com/, "Read Subject from CSR.csr");
 like($req_2->keyinfo(), qr/47:b0:60:58:46:3e:68:46/m, "Read Key Info from CSR.csr");
 like($req_2->pubkey_type(), qr/rsa/, "Read public key type from CSR.csr");
@@ -63,7 +63,7 @@ ok($req_2);
 }
 
 {
-my $req_csr = Crypt::OpenSSL::PKCS10->new_from_file("t/CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
+my $req_csr = Crypt::OpenSSL::PKCS10->new_from_file("t/csrs/CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
 like($req_csr->subject(), qr/C=DE, ST=NRW, L=Foo, O=Internet Widgits Pty Ltd, CN=foo.der.bar.com/, "Read Subject from CSR.csr (PEM)");
 like($req_csr->keyinfo(), qr/47:b0:60:58:46:3e:68:46/m, "Read Key Info from CSR.csr (PEM)");
 like($req_csr->pubkey_type(), qr/rsa/, "Read public key type from CSR.csr (PEM)");
@@ -72,7 +72,7 @@ ok($req_csr);
 }
 
 {
-my $req_der = Crypt::OpenSSL::PKCS10->new_from_file("t/CSR.der", Crypt::OpenSSL::PKCS10::FORMAT_ASN1());
+my $req_der = Crypt::OpenSSL::PKCS10->new_from_file("t/csrs/CSR.der", Crypt::OpenSSL::PKCS10::FORMAT_ASN1());
 like($req_der->subject(), qr/C=DE, ST=NRW, L=Foo, O=Internet Widgits Pty Ltd, CN=foo.der.bar.com/, "Read Subject from CSR.der (DER)");
 like($req_der->keyinfo(), qr/47:b0:60:58:46:3e:68:46/m, "Read Key Info from CSR.der (DER)");
 like($req_der->pubkey_type(), qr/rsa/, "Read public key type from CSR.der (DER)");
