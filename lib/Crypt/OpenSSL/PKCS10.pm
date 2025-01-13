@@ -40,10 +40,41 @@ XSLoader::load('Crypt::OpenSSL::PKCS10', $VERSION);
 sub new_from_rsa {
     my $self = shift;
     my $rsa = shift;
+    my ($options)   = shift || ();
 
     my $priv = $rsa->get_private_key_string();
-    $self->_new_from_rsa($rsa, $priv);
+    $self->_new_from_rsa($rsa, $priv, \%{$options});
 
+}
+
+sub new {
+    my $self = shift;
+
+    my $keylen;
+    my $options;
+
+    my $args = scalar @_;
+
+    if ($args eq 0) {
+        $keylen = 1024;
+    } elsif ($args eq 1) {
+        if (ref ($_[0]) eq 'HASH') { 
+            $keylen = 1024;
+            ($options) = $_[0];
+        } else {
+            $keylen = $_[0];
+        }
+    } elsif ($args eq 2) {
+        if (ref $_[0] eq 'HASH') {
+            die('Wrong order for arguements: [$keysize], [%options]');
+        }
+        $keylen = $_[0];
+        ($options) = $_[1];
+    } else {
+        die ('Maximum 2 optional arguements [$keysize], [%options]');  
+    }
+
+    $self->_new($keylen, \%{$options});
 }
 
 1;
@@ -73,6 +104,25 @@ Crypt::OpenSSL::PKCS10 - Perl extension to OpenSSL's PKCS10 API.
   print $req->pubkey_type();
   print $req->get_pem_req();
 
+  Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+  Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+  # With 2 arguements the keysize must be first
+  Crypt::OpenSSL::PKCS10->new(
+                                2048,   # 2048-bit RSA keysize 
+                                {
+                                    type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                    hash    => 'SHA256',   # Hash Algorithm name 
+                                });
+
+  Crypt::OpenSSL::PKCS10->new(
+                                {
+                                    type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                    curve   => 'secp521r1', # Eliptic Curve type (secp521r1 default)
+                                    hash    => 'SHA256',    # Hash Algorithm name   
+                                });
+
 =head1 ABSTRACT
 
   Crypt::OpenSSL::PKCS10 - Perl extension to OpenSSL's PKCS10 API.
@@ -87,8 +137,28 @@ Crypt::OpenSSL::PKCS10 provides the ability to create PKCS10 certificate request
 
 =item new
 
-Create a new Crypt::OpenSSL::PKCS10 object by generating a new RSA key pair. There is one optional argument, the key size,
-which has the default value of 1024 if omitted.
+Create a new Crypt::OpenSSL::PKCS10 object by generating a new key pair. There
+are two optional arguments, the key size which defaults to 1024, and a hash of
+options which can be used to customize options.
+
+  Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+  Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+  # With 2 arguements the keysize must be first
+  Crypt::OpenSSL::PKCS10->new(
+                                2048,   # 2048-bit RSA keysize 
+                                {
+                                    type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                    hash    => 'SHA256',   # Hash Algorithm name 
+                                });
+
+  Crypt::OpenSSL::PKCS10->new(
+                                {
+                                    type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                    curve   => 'secp521r1', # Eliptic Curve type (secp521r1 default)
+                                    hash    => 'SHA256',    # Hash Algorithm name   
+                                });
 
 =item new_from_rsa( $rsa_object )
 
@@ -156,6 +226,8 @@ This must be called after all extensions has been added. It actually copies the 
 This adds the signature to the PKCS10 request.
 
   $req->sign();
+
+  $req->sign("SHA256");     # Set the hash to use for the signature
 
 =item pubkey_type()
 
