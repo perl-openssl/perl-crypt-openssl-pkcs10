@@ -119,7 +119,7 @@ Crypt::OpenSSL::PKCS10 - Perl extension to OpenSSL's PKCS10 API.
   Crypt::OpenSSL::PKCS10->new(
                                 {
                                     type    => 'ec',        # Private key type ('rsa' or 'ec')
-                                    curve   => 'secp521r1', # Eliptic Curve type (secp521r1 default)
+                                    curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
                                     hash    => 'SHA256',    # Hash Algorithm name   
                                 });
 
@@ -156,7 +156,7 @@ options which can be used to customize options.
   Crypt::OpenSSL::PKCS10->new(
                                 {
                                     type    => 'ec',        # Private key type ('rsa' or 'ec')
-                                    curve   => 'secp521r1', # Eliptic Curve type (secp521r1 default)
+                                    curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
                                     hash    => 'SHA256',    # Hash Algorithm name   
                                 });
 
@@ -167,6 +167,9 @@ Create a new Crypt::OpenSSL::PKCS10 object by using key information from a Crypt
   my $rsa = Crypt::OpenSSL::RSA->generate_key(512);
   my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa);
 
+  my $rsa = Crypt::OpenSSL::RSA->generate_key(1024);
+  my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa, {type => 'rsa', hash => 'SHA384'});
+
 OpenSSL 3.0 has deprecated the RSA object which Crypt::OpenSSL::RSA creates.  new_from_rsa() is now a perl sub which obtains the private key as a string that is also passed to the _new_from_rsa() XS function.
 
 =item new_from_file( $filename )
@@ -175,7 +178,7 @@ Create a new Crypt::OpenSSL::PKCS10 object by reading the request and key inform
 
   my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr");
 
-Can also specify the format of the PKCS10 file, either DER or PEM format.  Here are some examples:
+You can also specify the format of the PKCS10 file, either DER or PEM format.  Here are some examples:
 
   my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
 
