@@ -20,6 +20,25 @@ $req->write_pem_pk('pk.pem');
 print $req->get_pem_pubkey();
 print $req->pubkey_type();
 print $req->get_pem_req();
+
+Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+# With 2 arguements the keysize must be first
+Crypt::OpenSSL::PKCS10->new(
+                              2048,   # 2048-bit RSA keysize 
+                              {
+                                  type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                  hash    => 'SHA256',   # Hash Algorithm name 
+                              });
+
+Crypt::OpenSSL::PKCS10->new(
+                              {
+                                  type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                  curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
+                                  hash    => 'SHA256',    # Hash Algorithm name   
+                              });
 ```
 
 # ABSTRACT
@@ -36,8 +55,30 @@ Crypt::OpenSSL::PKCS10 provides the ability to create PKCS10 certificate request
 
 - new
 
-    Create a new Crypt::OpenSSL::PKCS10 object by generating a new RSA key pair. There is one optional argument, the key size,
-    which has the default value of 1024 if omitted.
+    Create a new Crypt::OpenSSL::PKCS10 object by generating a new key pair. There
+    are two optional arguments, the key size which defaults to 1024, and a hash of
+    options which can be used to customize options.
+
+    ```perl
+    Crypt::OpenSSL::PKCS10->new()     # Defaults to a 1024-bit RSA private key
+
+    Crypt::OpenSSL::PKCS10->new(2048) # Specify a 2048-bit RSA private key
+
+    # With 2 arguements the keysize must be first
+    Crypt::OpenSSL::PKCS10->new(
+                                  2048,   # 2048-bit RSA keysize 
+                                  {
+                                      type    => 'rsa',      # Private key type ('rsa' or 'ec')
+                                      hash    => 'SHA256',   # Hash Algorithm name 
+                                  });
+
+    Crypt::OpenSSL::PKCS10->new(
+                                  {
+                                      type    => 'ec',        # Private key type ('rsa' or 'ec')
+                                      curve   => 'secp384r1', # Eliptic Curve type (secp384r1 default)
+                                      hash    => 'SHA256',    # Hash Algorithm name   
+                                  });
+    ```
 
 - new\_from\_rsa( $rsa\_object )
 
@@ -46,6 +87,9 @@ Crypt::OpenSSL::PKCS10 provides the ability to create PKCS10 certificate request
     ```perl
     my $rsa = Crypt::OpenSSL::RSA->generate_key(512);
     my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa);
+
+    my $rsa = Crypt::OpenSSL::RSA->generate_key(1024);
+    my $req = Crypt::OpenSSL::PKCS10->new_from_rsa($rsa, {type => 'rsa', hash => 'SHA384'});
     ```
 
     OpenSSL 3.0 has deprecated the RSA object which Crypt::OpenSSL::RSA creates.  new\_from\_rsa() is now a perl sub which obtains the private key as a string that is also passed to the \_new\_from\_rsa() XS function.
@@ -56,6 +100,14 @@ Crypt::OpenSSL::PKCS10 provides the ability to create PKCS10 certificate request
 
     ```perl
     my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr");
+    ```
+
+    You can also specify the format of the PKCS10 file, either DER or PEM format.  Here are some examples:
+
+    ```perl
+    my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.csr", Crypt::OpenSSL::PKCS10::FORMAT_PEM());
+
+    my $req = Crypt::OpenSSL::PKCS10->new_from_file("CSR.der", Crypt::OpenSSL::PKCS10::FORMAT_ASN1());
     ```
 
 # Instance Methods
@@ -106,8 +158,10 @@ Crypt::OpenSSL::PKCS10 provides the ability to create PKCS10 certificate request
 
     This adds the signature to the PKCS10 request.
 
-    ```
+    ```perl
     $req->sign();
+
+    $req->sign("SHA256");     # Set the hash to use for the signature
     ```
 
 - pubkey\_type()
