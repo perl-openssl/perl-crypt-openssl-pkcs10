@@ -88,12 +88,13 @@ my %WriteMakefileArgs = (
     "Crypt::OpenSSL::Guess" => "0.11",
     "Crypt::OpenSSL::RSA" => 0,
     "File::Slurper" => 0,
+    "File::Spec::Functions" => 0,
     "File::Temp" => 0,
     "Import::Into" => 0,
     "Test::Lib" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.27",
+  "VERSION" => "0.28",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -109,6 +110,7 @@ my %FallbackPrereqs = (
   "Crypt::OpenSSL::RSA" => 0,
   "Exporter" => 0,
   "File::Slurper" => 0,
+  "File::Spec::Functions" => 0,
   "File::Temp" => 0,
   "Import::Into" => 0,
   "Test::Lib" => 0,

@@ -15,6 +15,7 @@ on 'test' => sub {
   requires "Crypt::OpenSSL::Guess" => "0.11";
   requires "Crypt::OpenSSL::RSA" => "0";
   requires "File::Slurper" => "0";
+  requires "File::Spec::Functions" => "0";
   requires "File::Temp" => "0";
   requires "Import::Into" => "0";
   requires "Test::Lib" => "0";
