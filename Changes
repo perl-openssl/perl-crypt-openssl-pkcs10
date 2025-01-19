@@ -2,6 +2,20 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
 {{$NEXT}}
 
+0.29 -- Sun Jan 19 10:55:51 AST 2025
+
+    [Significant updates since 0.26]
+    - Merge RT#106313 from DDICK (Sorry its been 10 years)
+    - RT#106313 allows you to import PEM or DER based CSRs from a file
+    - Closes RT#133121 added support for Elliptic Curve based Certificate Requests
+    - This release allow you to choose specify the hash algorithm for RSA
+    - the sign() function supports specifying the hash algorithm
+    - For EC you can specify the hash algorithm and curve
+    - Added a Security Policy in SECURITY.md 
+
+    [Change Log]
+    - 2f829b5 Add test to display openssl version
+
 0.28 -- Fri Jan 17 21:11:48 AST 2025
 
     [Significant updates since 0.26]
