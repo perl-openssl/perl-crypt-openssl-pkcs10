@@ -324,6 +324,29 @@ const EVP_MD *fetch_digest(char *hash) {
 	return md;
 }
 
+int get_ec_curve_by_name(char * curve) {
+    int nid = 0;
+	/*
+	 * workaround for the SECG curve names secp192r1 and secp256r1 (which
+	 * are the same as the curves prime192v1 and prime256v1 defined in
+	 * X9.62)
+	*/
+	if (!strcmp(curve, "secp192r1")) {
+		printf("using curve name prime192v1 instead of secp192r1\n");
+		nid = NID_X9_62_prime192v1;
+	} else if (!strcmp(curve, "secp256r1")) {
+		printf("using curve name prime256v1 instead of secp256r1\n");
+		nid = NID_X9_62_prime256v1;
+	} else
+		nid = OBJ_sn2nid(curve);
+		if (nid == 0)
+			nid = EC_curve_nist2nid(curve);
+		if (nid == 0) {
+			croak("unknown curve name (%s)\n", curve);
+	}
+	return nid;
+}
+
 MODULE = Crypt::OpenSSL::PKCS10		PACKAGE = Crypt::OpenSSL::PKCS10
 
 PROTOTYPES: DISABLE
@@ -421,6 +444,8 @@ _new(class, keylen, options )
 		croak ("%s: Unable to generate a %s key for %s", classname,
             type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #elif OPENSSL_VERSION_NUMBER <= 0x10000000L
+	if (strncmp (type, "ec", strlen("ec")) == 0)
+		croak("EC unsupported for your version of OpenSSL");
     RSA *rsa;
 	if ((pk=EVP_PKEY_new()) == NULL)
 		croak ("%s - EVP_PKEY_new failed", classname);
@@ -430,31 +455,35 @@ _new(class, keylen, options )
 		croak ("%s: Unable to generate a %s key for %s", classname,
             type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #else
-	if (strncmp (type, "rsa", strlen("rsa")) == 0)
-		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
-	else
-		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
-
-	if (!pkctx)
-		croak ("%s: EVP_PKEY_CTX_new_id failed for %s" , classname, type);
-
-	if (EVP_PKEY_keygen_init(pkctx) <= 0)
-		croak ("%s: EVP_PKEY_keygen_int failed", classname);
-
+	if (RAND_status() == 0)
+		croak("%s: Insufficient Randomness", classname);
 	if (strncmp (type, "rsa", strlen("rsa")) == 0) {
+		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, NULL);
+		if (EVP_PKEY_keygen_init(pkctx) <= 0)
+			croak ("%s: EVP_PKEY_keygen_int failed", classname);
 		if (EVP_PKEY_CTX_set_rsa_keygen_bits(pkctx, keylen) <= 0)
 			croak ("%s: EVP_PKEY_CTX_set_rsa_keygen_bits failed for keylen: %i", classname, keylen);
 	} else {
-		if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pkctx, OBJ_sn2nid(curve)) <= 0)
-			croak ("%s: EVP_PKEY_CTX_set_ec_paramgen_curve_nid failed for %s", classname, curve);
+		int nid = get_ec_curve_by_name(curve);
+
+		pkctx = EVP_PKEY_CTX_new_id(EVP_PKEY_EC, NULL);
+		if (pkctx == NULL)
+			croak("%s: EVP_PKEY_CTX_new_id failed", classname);
+		if (EVP_PKEY_keygen_init(pkctx) <= 0)
+			croak("%s: EVP_PKEY_keygen_init failed", classname);
+		if (EVP_PKEY_CTX_set_ec_paramgen_curve_nid(pkctx, nid) <= 0)
+			croak("%s: EVP_PKEY_CTX_set_ec_paramgen_curve_nid failed", classname);
+		if (EVP_PKEY_CTX_set_ec_param_enc(pkctx, OPENSSL_EC_NAMED_CURVE) <= 0)
+			croak("%s: EVP_PKEY_CTX_set_ec_param_enc failed", classname);
 	}
-	/* Generate key */
 	if (EVP_PKEY_keygen(pkctx, &pk) <= 0)
 		croak ("%s: Unable to generate a %s key for %s", classname,
-            type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
+			type, ((strncmp(type, "rsa", strlen("rsa")) == 0) ? hash : curve) );
 #endif
-	X509_REQ_set_pubkey(x,pk);
-	X509_REQ_set_version(x,0L);
+	if(!X509_REQ_set_version(x,0L))
+		croak("%s: X509_REQ_set_version failed", classname);
+	if (!X509_REQ_set_pubkey(x,pk))
+		croak("%s: X509_REQ_set_pubkey failed", classname);
 #if OPENSSL_VERSION_NUMBER >= 0x30000000L
 	EVP_MD_CTX *mctx = EVP_MD_CTX_new();
 

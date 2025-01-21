@@ -18,12 +18,14 @@ require Exporter;
 my $openssl_bin = find_openssl_exec(find_openssl_prefix());
 
 my $config_loc = `$openssl_bin version -d`;
+
 $config_loc =~ m/OPENSSLDIR: "(.*)"/;
 
 my $configfile = catfile($1, 'openssl.cnf');
 
 if (! -e "$configfile") {
 	$configfile = ' -config t\\openssl.cnf';
+	$ENV{'OPENSSL_CONF'} = 't\openssl.cnf';
 } else {
     $configfile = '';
 }
@@ -48,3 +50,4 @@ sub get_openssl_output {
 
     return $output;
 }
+

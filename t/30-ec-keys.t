@@ -27,7 +27,7 @@ foreach my $hash (@hashs) {
     eval {
          $req = Crypt::OpenSSL::PKCS10->new({type => 'ec', curve => 'sect112r1'});
     };
-    like ($@, qr/EVP_PKEY_CTX_set_ec_paramgen_curve_nid|Unable to generate a ec key for sect112r1/, "Invalid curve cannot create a key");
+    like ($@, qr/unknown curve name \(sect112r1\)|ec key for sect112r1/, "Invalid curve cannot create a key");
 }
 
 #diag("Too many arguements passed"); 
