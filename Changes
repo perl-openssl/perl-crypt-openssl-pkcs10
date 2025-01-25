@@ -2,6 +2,20 @@ Revision history for Perl extension Crypt::OpenSSL::PKCS10.
 
 {{$NEXT}}
 
+0.34 -- Fri Jan 24 20:26:55 AST 2025
+
+    [Significant updates since 0.31]
+    - Updates for openssl 1.0 versions
+    - Merged a minor Fedora patch for the Change log for correct UTF-8 names
+    - Ah the good old days when SHA1 was good enough :-). RHEL, Fedora, SUSE
+    - etc. have more secure configurations so many of the digests and curves
+    - tested would fail - So test only a reduced set (based on Fedora 42+)
+
+    [Change Log]
+    - 47bea5b Increment version for a release
+    - 0acc30e v0.33
+    - 30872b6 Update repo version
+
 0.33 -- Thu Jan 23 22:33:34 AST 2025
 
     [Significant updates since 0.31]
