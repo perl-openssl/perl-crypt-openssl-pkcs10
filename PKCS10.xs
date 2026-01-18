@@ -856,15 +856,23 @@ add_custom_ext(pkcs10, oid_SV, ext_SV)
         pkcs10->exts = sk_X509_EXTENSION_new_null();
     if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
         croak ("%s: OBJ_create() for OID %s failed",
-         (ix == 0 ? "add_custom_ext_raw" : "add_custom_ext"), oid);
+         (ix == 0 ? "add_custom_ext" : "add_custom_ext_raw"), oid);
+
+    if ( ix == 0 ) {
 #if (defined LIBRESSL_VERSION_NUMBER)
-    RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
+        warn ("LIBRESSL does not support add_custom_ext using add_custom_ext_raw");
+        RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
 #else
-    X509V3_EXT_add_alias(nid, NID_netscape_comment);
-    RETVAL = add_ext(pkcs10->exts, pkcs10->req, nid, ext);
+        X509V3_EXT_add_alias(nid, NID_netscape_comment);
+        RETVAL = add_ext(pkcs10->exts, pkcs10->req, nid, ext);
 #endif
+    }
+    else {
+        RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
+    }
     if (!RETVAL)
-        croak ("add_custom_ext oid: %s, ext: %s", oid, ext);
+        croak ("%s oid: %s, ext: %s",
+          (ix == 0 ? "add_custom_ext" : "add_custom_ext_raw"), oid, ext);
 
     OUTPUT:
       RETVAL
