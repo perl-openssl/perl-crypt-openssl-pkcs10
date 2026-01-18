@@ -11,6 +11,7 @@
 #include <openssl/err.h>
 #include <openssl/rand.h>
 #include <openssl/evp.h>
+#include <openssl/opensslv.h>
 
 #include "ppport.h"
 
@@ -834,41 +835,14 @@ add_ext(pkcs10, nid = NID_key_usage, ext_SV)
 	RETVAL
 
 int
-add_custom_ext_raw(pkcs10, oid_SV, ext_SV)
-	pkcs10Data *pkcs10;
-	SV* oid_SV;
-	SV* ext_SV;
-
-	PREINIT:
-	char* oid;
-	char* ext;
-	STRLEN ext_length;
-	int nid;
-
-	CODE:
-	oid = SvPV(oid_SV, ext_length);
-	ext = SvPV(ext_SV, ext_length);
- 
-  	if(!pkcs10->exts)
-		pkcs10->exts = sk_X509_EXTENSION_new_null();
-
-	if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
-        croak ("add_custom_ext: OBJ_create() for OID %s failed", oid);
-	RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
-
-	if (!RETVAL)
-		croak ("add_custom_ext_raw oid: %s, ext: %s", oid, ext);
-
-	OUTPUT:
-	RETVAL
-
-
-int
 add_custom_ext(pkcs10, oid_SV, ext_SV)
 	pkcs10Data *pkcs10;
 	SV* oid_SV;
 	SV* ext_SV;
 
+	ALIAS:
+	    add_custom_ext_raw = 1
+
 	PREINIT:
 	char* oid;
 	char* ext;
@@ -878,15 +852,17 @@ add_custom_ext(pkcs10, oid_SV, ext_SV)
 	CODE:
 	oid = SvPV(oid_SV, ext_length);
 	ext = SvPV(ext_SV, ext_length);
-
-	if(!pkcs10->exts)
+  	if(!pkcs10->exts)
 		pkcs10->exts = sk_X509_EXTENSION_new_null();
-
 	if ((nid = OBJ_create(oid, oid, oid)) == NID_undef)
-        croak ("add_custom_ext_raw: OBJ_create() for OID %s failed", oid);
+        croak ("%s: OBJ_create() for OID %s failed",
+		 (ix == 0 ? "add_custom_ext_raw" : "add_custom_ext"), oid);
+#if (defined LIBRESSL_VERSION_NUMBER)
+	RETVAL = add_ext_raw(pkcs10->exts, nid, ext, ext_length);
+#else
 	X509V3_EXT_add_alias(nid, NID_netscape_comment);
 	RETVAL = add_ext(pkcs10->exts, pkcs10->req, nid, ext);
-
+#endif
 	if (!RETVAL)
 		croak ("add_custom_ext oid: %s, ext: %s", oid, ext);
 
